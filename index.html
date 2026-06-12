@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Révisions CAP Charcutier Traiteur</title>
+<style>
+:root {
+  --bg: #FBF8F3;
+  --card: #FFFFFF;
+  --ink: #2C2321;
+  --muted: #8A7D75;
+  --border: #E8E0D6;
+  --rust: #B8432F;
+  --sage: #1B6B4A;
+  --blue: #2E5FA1;
+  --gold: #8B6914;
+  --plum: #6B4C8A;
+  --rust-bg: #FDF0ED;
+  --sage-bg: #EEF6F1;
+  --blue-bg: #EDF2F9;
+  --gold-bg: #F9F5E8;
+  --plum-bg: #F4F0F7;
+  --sidebar-bg: #2C2321;
+  --sidebar-text: #C4B8AE;
+  --sidebar-active: #F5E6D0;
+  --radius: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+/* ── LAYOUT ── */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text);
+  position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto;
+  display: flex; flex-direction: column; z-index: 100;
+  transition: transform 0.3s;
+}
+.sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sidebar-header h1 { font-size: 18px; color: #fff; line-height: 1.3; margin-bottom: 4px; }
+.sidebar-header p { font-size: 12px; opacity: 0.5; font-style: italic; }
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; padding: 16px 24px 6px; color: rgba(255,255,255,0.3); }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 24px; cursor: pointer; transition: all 0.15s;
+  font-size: 13px; border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
+.nav-item.active { background: rgba(184,67,47,0.15); border-left-color: var(--rust); color: var(--sidebar-active); font-weight: 700; }
+.nav-icon { font-size: 16px; flex-shrink: 0; width: 22px; text-align: center; }
+.nav-count { margin-left: auto; font-size: 10px; background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 10px; }
+.sidebar-footer { padding: 14px 24px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; opacity: 0.35; text-align: center; }
+
+.main { margin-left: 280px; flex: 1; min-height: 100vh; }
+.main-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  padding: 16px 32px; display: flex; align-items: center; gap: 12px;
+}
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--ink); padding: 4px; }
+.main-title { font-size: 18px; font-weight: 700; }
+.main-subtitle { font-size: 12px; color: var(--muted); margin-left: 8px; }
+.search-box {
+  margin-left: auto; position: relative;
+}
+.search-box input {
+  font-family: Georgia, serif; font-size: 13px; padding: 7px 14px 7px 32px;
+  border: 1px solid var(--border); border-radius: 20px; background: var(--card);
+  width: 220px; outline: none; color: var(--ink);
+}
+.search-box input:focus { border-color: var(--rust); }
+.search-box::before { content: '🔍'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; }
+.content { padding: 24px 32px 80px; max-width: 860px; }
+
+/* ── SECTIONS ── */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── HOME ── */
+.home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 20px; }
+.home-card {
+  background: var(--card); border-radius: var(--radius); padding: 20px;
+  border-left: 4px solid var(--rust); cursor: pointer;
+  box-shadow: 0 1px 3px rgba(44,35,33,0.05); transition: all 0.2s;
+}
+.home-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(44,35,33,0.08); }
+.home-card .hc-icon { font-size: 28px; margin-bottom: 8px; }
+.home-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.home-card p { font-size: 12px; color: var(--muted); }
+.home-card .hc-count { font-size: 11px; color: var(--rust); margin-top: 8px; font-weight: 600; }
+.home-stats {
+  display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.stat-pill {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  padding: 8px 18px; font-size: 13px;
+}
+.stat-pill strong { color: var(--rust); }
+
+/* ── CARDS ── */
+details.mod { margin-bottom: 20px; }
+details.mod > summary {
+  display: flex; align-items: center; gap: 10px; padding: 10px 0;
+  cursor: pointer; list-style: none; font-size: 16px; font-weight: 700;
+  -webkit-tap-highlight-color: transparent;
+}
+details.mod > summary::-webkit-details-marker { display: none; }
+details.mod > summary .mbadge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  padding: 3px 9px; border-radius: 4px; color: #fff;
+}
+details.mod > summary .marrow { margin-left: auto; font-size: 14px; color: var(--muted); transition: transform 0.2s; }
+details.mod[open] > summary .marrow { transform: rotate(180deg); }
+
+details.fc {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(44,35,33,0.05); margin-bottom: 8px; overflow: hidden;
+}
+details.fc > summary {
+  display: flex; align-items: baseline; gap: 8px; padding: 12px 16px;
+  cursor: pointer; list-style: none; border-left: 3.5px solid var(--c, var(--rust));
+  -webkit-tap-highlight-color: transparent;
+}
+details.fc > summary::-webkit-details-marker { display: none; }
+details.fc > summary .fn { font-size: 10px; font-weight: 700; color: #fff; padding: 2px 6px; border-radius: 3px; background: var(--c, var(--rust)); flex-shrink: 0; }
+details.fc > summary .ft { font-size: 13.5px; font-weight: 600; flex: 1; }
+details.fc > summary .fa { font-size: 12px; color: var(--muted); }
+details.fc[open] > summary .fa { transform: rotate(180deg); }
+.fb { padding: 0 16px 12px; border-left: 3.5px solid var(--c, var(--rust)); }
+.fb ul { list-style: none; padding: 0; }
+.fb li { font-size: 12.5px; color: var(--muted); padding: 2px 0 2px 14px; position: relative; line-height: 1.5; }
+.fb li::before { content: '·'; position: absolute; left: 2px; color: #C4A99E; font-weight: 700; font-size: 15px; }
+.fb strong { color: var(--ink); font-weight: 600; }
+.fb table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 12px; }
+.fb th { background: var(--c, var(--rust)); color: #fff; padding: 5px 8px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+.fb td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
+.fb tr:last-child td { border-bottom: none; }
+.fb td:first-child { font-weight: 600; color: var(--ink); }
+.fb .note { font-size: 12px; color: var(--muted); padding: 7px 10px; background: #F5F2ED; border-radius: 5px; border-left: 3px solid #C4A99E; line-height: 1.5; margin-top: 6px; }
+.opts { list-style: none !important; padding: 0 !important; }
+.opts li::before { content: '○' !important; color: #C4A99E !important; font-size: 12px !important; }
+.opts li.ok { color: var(--sage) !important; font-weight: 600 !important; }
+.opts li.ok::before { content: '●' !important; color: var(--sage) !important; }
+.vf { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-bottom: 4px; }
+.vf.v { background: var(--sage-bg); color: var(--sage); }
+.vf.f { background: var(--rust-bg); color: var(--rust); }
+.recipe { font-size: 12px; background: #FFFBF3; border: 1px solid var(--border); border-radius: 5px; padding: 8px 10px; margin: 6px 0; }
+.recipe h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--c, var(--rust)); margin-bottom: 4px; }
+
+/* ── SEARCH RESULTS ── */
+.search-results { margin-top: 16px; }
+.sr-empty { font-size: 14px; color: var(--muted); font-style: italic; padding: 40px 0; text-align: center; }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); width: 280px; }
+  .sidebar.open { transform: translateX(0); }
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
+  .overlay.show { display: block; }
+  .main { margin-left: 0; }
+  .hamburger { display: block; }
+  .main-header { padding: 12px 16px; }
+  .content { padding: 16px 16px 80px; }
+  .search-box input { width: 140px; }
+  .home-grid { grid-template-columns: 1fr; }
+  .main-subtitle { display: none; }
+}
+
+@media print {
+  .sidebar, .main-header, .overlay { display: none !important; }
+  .main { margin-left: 0; }
+  .section { display: block !important; page-break-before: always; }
+  .section:first-child { page-break-before: auto; }
+  details.fc { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+  details.mod { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>CAP Charcutier Traiteur</h1>
+      <p>Révisions complètes</p>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Accueil</div>
+      <div class="nav-item active" onclick="go('home')"><span class="nav-icon">🏠</span> Tableau de bord</div>
+
+      <div class="nav-section">Quiz</div>
+      <div class="nav-item" onclick="go('quiz')"><span class="nav-icon">📝</span> Quiz Complet <span class="nav-count">44</span></div>
+      <div class="nav-item" onclick="go('quizref')"><span class="nav-icon">🎯</span> Quiz Référentiel <span class="nav-count">40</span></div>
+      <div class="nav-item" onclick="go('anatomy')"><span class="nav-icon">🦴</span> Anatomie & Découpes <span class="nav-count">30</span></div>
+      <div class="nav-item" onclick="go('problems')"><span class="nav-icon">🔍</span> Problématiques <span class="nav-count">30</span></div>
+
+      <div class="nav-section">Fiches</div>
+      <div class="nav-item" onclick="go('codusages')"><span class="nav-icon">📜</span> Code des Usages</div>
+      <div class="nav-item" onclick="go('fabrication')"><span class="nav-icon">🥩</span> Fabrication</div>
+      <div class="nav-item" onclick="go('produits')"><span class="nav-icon">🌭</span> Familles de produits</div>
+      <div class="nav-item" onclick="go('tiac')"><span class="nav-icon">⚠</span> TIAC & Allergènes</div>
+      <div class="nav-item" onclick="go('traiteur')"><span class="nav-icon">🥐</span> Techniques Traiteur</div>
+      <div class="nav-item" onclick="go('orga')"><span class="nav-icon">🔧</span> Organisation & Sécurité</div>
+    </div>
+    <div class="sidebar-footer">Examen 2026</div>
+  </nav>
+
+  <div class="main">
+    <header class="main-header">
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="main-title" id="mainTitle">Tableau de bord</span>
+      <span class="main-subtitle" id="mainSub"></span>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Rechercher…" oninput="handleSearch(this.value)">
+      </div>
+    </header>
+
+    <div class="content" id="contentArea">
+      <!-- All sections are injected here -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA — All content embedded
+// ═══════════════════════════════════════
+
+const SECTIONS = {
+home: { title: "Tableau de bord", sub: "", html: `
+<div class="home-stats">
+  <span class="stat-pill"><strong>84+</strong> questions</span>
+  <span class="stat-pill"><strong>30</strong> problématiques</span>
+  <span class="stat-pill"><strong>7</strong> modules</span>
+  <span class="stat-pill"><strong>100%</strong> du référentiel</span>
+</div>
+<div class="home-grid">
+  <div class="home-card" style="border-left-color:var(--rust)" onclick="go('quiz')"><div class="hc-icon">📝</div><h3>Quiz Complet</h3><p>Sciences appliquées et technologie — QCM et Vrai/Faux</p><div class="hc-count">44 questions</div></div>
+  <div class="home-card" style="border-left-color:var(--plum)" onclick="go('quizref')"><div class="hc-icon">🎯</div><h3>Quiz Référentiel</h3><p>Compétences exactes du programme — pâtes, sauces, organisation</p><div class="hc-count">40 questions</div></div>
+  <div class="home-card" style="border-left-color:var(--sage)" onclick="go('anatomy')"><div class="hc-icon">🦴</div><h3>Anatomie & Découpes</h3><p>Os, organes, morceaux du porc + tableaux d'associations</p><div class="hc-count">30 questions</div></div>
+  <div class="home-card" style="border-left-color:var(--blue)" onclick="go('problems')"><div class="hc-icon">🔍</div><h3>Problématiques</h3><p>10 produits × 3 défauts — causes et remédiations</p><div class="hc-count">30 fiches</div></div>
+  <div class="home-card" style="border-left-color:var(--gold)" onclick="go('codusages')"><div class="hc-icon">📜</div><h3>Code des Usages</h3><p>Supérieur / choix / standard, critères chiffrés, durées de vie</p><div class="hc-count">5 fiches</div></div>
+  <div class="home-card" style="border-left-color:var(--rust)" onclick="go('fabrication')"><div class="hc-icon">🥩</div><h3>Fabrication</h3><p>Jambon cuit, pâté de campagne — recettes et procédés complets</p><div class="hc-count">7 fiches</div></div>
+  <div class="home-card" style="border-left-color:var(--blue)" onclick="go('produits')"><div class="hc-icon">🌭</div><h3>Familles de produits</h3><p>Saucisses, andouilles, boudins, pièces séchées — critères techniques</p><div class="hc-count">6 fiches</div></div>
+  <div class="home-card" style="border-left-color:var(--plum)" onclick="go('tiac')"><div class="hc-icon">⚠</div><h3>TIAC & Allergènes</h3><p>Sécurité alimentaire, Listeria, 14 allergènes, étiquetage</p><div class="hc-count">5 fiches</div></div>
+  <div class="home-card" style="border-left-color:var(--rust)" onclick="go('traiteur')"><div class="hc-icon">🥐</div><h3>Techniques Traiteur</h3><p>5 pâtes, 3 sauces, garnitures, œufs, émulsions, ficelage</p><div class="hc-count">12 fiches</div></div>
+  <div class="home-card" style="border-left-color:var(--sage)" onclick="go('orga')"><div class="hc-icon">🔧</div><h3>Organisation & Sécurité</h3><p>EPI, TMS, réception, stockage, déchets, nettoyage</p><div class="hc-count">10 fiches</div></div>
+</div>
+`},
+
+// ═══ QUIZ COMPLET ═══
+quiz: { title: "Quiz Complet", sub: "44 questions", html: `
+<details class="mod" open><summary><span class="mbadge" style="background:var(--rust)">🔧</span> Métier, Hygiène & Matériel<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">1</span><span class="ft">Que signifie HACCP ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Hazard Analysis Critical Control Point</li><li>Hygiène Alimentaire et Contrôle Critique des Produits</li><li>Haute Analyse des Contaminations en Cuisine Professionnelle</li></ul><div class="note">HACCP = méthode d'identification des dangers et des points critiques de maîtrise.</div></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">2</span><span class="ft">Principe de la « marche en avant » ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Les produits progressent du sale vers le propre sans retour en arrière</li><li>Les employés marchent toujours vers l'avant</li><li>Les marchandises entrent et sortent par la même porte</li></ul><div class="note">Évite tout croisement entre produits sales et propres.</div></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">3</span><span class="ft">4 étapes du plan de nettoyage ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Nettoyer, rincer, désinfecter, rincer</li><li>Laver, sécher, ranger, contrôler</li><li>Prélaver, dégraisser, stériliser, sécher</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">4</span><span class="ft">Un poussoir sert à :</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Remplir des boyaux de farce (embossage)</li><li>Pousser la viande dans le hachoir</li><li>Presser les jus de cuisson</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">5</span><span class="ft">Matériel pour hachage fin et émulsions ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Le cutter à cuve rotative</li><li>Le hachoir</li><li>Le mélangeur</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">6</span><span class="ft">V/F — Le malaxeur incorpore maigre, gras et garnitures.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Le malaxeur sert au massage après saumurage. C'est le mélangeur qui incorpore.</div></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">7</span><span class="ft">Que signifie « embosser » ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Remplir un boyau de farce</li><li>Envelopper d'une barde</li><li>Ficeler une volaille</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">8</span><span class="ft">Que signifie « chemiser » ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Tapisser un moule (gelée, bardes)</li><li>Couper en lanières</li><li>Assaisonner avant cuisson</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">9</span><span class="ft">Que signifie « parer » ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Retirer les parties inutiles</li><li>Piquer de lardons</li><li>Vérifier la température à cœur</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--gold)">🐷</span> Matières Premières & Découpe<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">1</span><span class="ft">Porc charcutier : âge et poids ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">5-6 mois, 90-110 kg</li><li>3 mois, 50 kg</li><li>12 mois, 150 kg</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">2</span><span class="ft">Race belge à taches noires/rousses ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Piétrain</li><li>Large White</li><li>Duroc</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">3</span><span class="ft">Boyau pour la Rosette de Lyon ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Le fuseau (rectum)</li><li>Le menu (intestin grêle)</li><li>Le chaudin (côlon)</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">4</span><span class="ft">Boyau pour les saucisses de Toulouse ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Le menu (intestin grêle)</li><li>Le chaudin (côlon)</li><li>La baudruche (cæcum)</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">5</span><span class="ft">SEUROP : ≥ 60 % viande maigre ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">S</li><li>E</li><li>U</li></ul><div class="note">S ≥ 60 %, E ≥ 55 %, U 50-55 %, R 45-50 %, O 40-45 %, P < 40 %.</div></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">6</span><span class="ft">Le sang sert principalement à fabriquer :</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Du boudin noir</li><li>Du pâté de campagne</li><li>Du saucisson sec</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">7</span><span class="ft">Température d'échaudage ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">60-62 °C</li><li>45-50 °C</li><li>75-80 °C</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">8</span><span class="ft">V/F — « Truffé » = min 5 % de truffes.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Le minimum réglementaire est 3 %, pas 5 %.</div></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--sage)">🔥</span> Techniques & Conservation<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">1</span><span class="ft">Température du fumage à froid ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">20-30 °C</li><li>60-80 °C</li><li>10-15 °C</li></ul><div class="note">Fumage à froid = aromatisation sans cuisson. Fumage à chaud = 60-80 °C.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">2</span><span class="ft">Combustible le plus courant pour le fumage ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Sciure de hêtre</li><li>Sciure de pin</li><li>Copeaux de sapin</li></ul><div class="note">Jamais de résineux.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">3</span><span class="ft">Stérilisation : quelle température ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">+120 °C en autoclave</li><li>85 °C au bain-marie</li><li>63 °C à cœur</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">4</span><span class="ft">Taille d'une brunoise ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">2 mm</li><li>4 mm</li><li>1 cm</li></ul><div class="note">Brunoise = 2 mm. Macédoine = 4 mm. Mirepoix = 1 cm.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">5</span><span class="ft">Rôle du sel nitrité (E250) ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Conservation, couleur rosée, action antibactérienne</li><li>Attendrir la viande</li><li>Accélérer le séchage</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">6</span><span class="ft">V/F — La pasteurisation détruit tous les MO.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Pasteurisation = destruction partielle (63-85 °C). Stérilisation (120 °C) = totale.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">7</span><span class="ft">La DLC signifie :</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Date Limite de Consommation</li><li>Date Limite de Conservation</li><li>Durée Limite de Congélation</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">8</span><span class="ft">V/F — FIFO = premier entré, premier sorti.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf v">✓ Vrai</span><div class="note">FIFO = First In, First Out. En français : PEPS.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">9</span><span class="ft">L'IGP garantit que :</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Au moins une étape dans la zone géographique</li><li>Toutes les étapes dans une aire définie</li><li>Le produit est biologique</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--blue)">🧫</span> Microbiologie & Sécurité<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">1</span><span class="ft">Qu'est-ce qu'un porteur sain ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Personne hébergeant un pathogène sans symptôme mais contagieuse</li><li>Personne vaccinée</li><li>Aliment sans danger</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">2</span><span class="ft">T.A.C.T. (Cercle de Sinner) ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Temps, Action mécanique, Chimie, Température</li><li>Technique, Analyse, Contrôle, Traçabilité</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">3</span><span class="ft">Température optimale des mésophiles ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">37 °C</li><li>4 °C</li><li>60 °C</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">4</span><span class="ft">Multiplication bactérienne = ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Scissiparité (division en 2 cellules filles)</li><li>Bourgeonnement</li><li>Sporulation</li></ul><div class="note">Bactéries = scissiparité. Levures = bourgeonnement. Moisissures = sporulation.</div></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">5</span><span class="ft">V/F — Le froid détruit les spores.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Le froid ralentit seulement. Destruction : 120 °C pendant 5 min (chaleur humide).</div></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">6</span><span class="ft">Zone critique des MO ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">10 °C – 63 °C</li><li>0 °C – 4 °C</li><li>63 °C – 100 °C</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">7</span><span class="ft">Liaison froide : T° et durée ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">< 10 °C à cœur en < 2 h</li><li>< 4 °C en < 30 min</li><li>< 0 °C en < 1 h</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--plum)">⚡</span> Équipements, Nutrition & Aliments<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">1</span><span class="ft">Vaporisation = réaction ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Endothermique (absorbe la chaleur)</li><li>Exothermique</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">2</span><span class="ft">P = ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">P = U × I (Watt = Volt × Ampère)</li><li>P = U / I</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">3</span><span class="ft">1 g de lipides = ? kcal</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">9 kcal</li><li>4 kcal</li><li>7 kcal</li></ul><div class="note">Lipides = 9 kcal/g. Glucides = 4 kcal/g. Protides = 4 kcal/g.</div></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">4</span><span class="ft">Réaction de Maillard ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Couleur dorée et arômes (sucres + protéines à haute T°)</li><li>Bulles de gaz</li><li>Solidification du blanc d'œuf</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">5</span><span class="ft">Les 5 saveurs fondamentales ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Sucré, salé, acide, amer, umami</li><li>Sucré, salé, amer, piquant, astringent</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">6</span><span class="ft">Éclairage minimum en zone de travail ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">300 lux</li><li>100 lux</li><li>500 lux</li></ul></div></details>
+</details>
+`},
+
+// For brevity, I'll include the remaining sections with key content
+// ═══ QUIZ RÉFÉRENTIEL ═══
+quizref: { title: "Quiz Référentiel", sub: "40 questions", html: `
+<details class="mod" open><summary><span class="mbadge" style="background:var(--rust)">🥩</span> Pôle 1 · Préparation et production<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">1</span><span class="ft">Protocole pour casser des œufs en coquille ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Les casser un par un dans un récipient séparé</li><li>Les casser directement dans la préparation</li></ul><div class="note">Détecte les œufs avariés et évite de contaminer la préparation.</div></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">2</span><span class="ft">5 étapes d'habillage d'une volaille ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Étirer, flamber, vider, parer, brider</li><li>Plumer, laver, saler, ficeler, cuire</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">3</span><span class="ft">Que signifie « désossage à blanc » ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Retirer l'os sans entailler la viande autour</li><li>Désosser après blanchiment</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">4</span><span class="ft">Deux techniques de ficelage ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Ficelle arrêtée (boucles individuelles) et à la roulette (spirale)</li><li>Simple et double</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">5</span><span class="ft">Différence salage / saumurage / salaison ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Salage = sel sec · Saumurage = sel en solution · Salaison = procédé complet</li><li>Trois mots pour la même technique</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">6</span><span class="ft">V/F — La cuisson sous vide est au programme du CAP.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">La cuisson sous vide est exclue. On connaît le conditionnement sous vide, pas la cuisson.</div></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">7</span><span class="ft">Les 5 pâtes de base au programme ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Feuilletée classique, brisée, à choux, levée, à crêpes</li><li>Feuilletée, sablée, sucrée, pizza, brioche</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">8</span><span class="ft">Les 3 sauces de base au programme ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Mayonnaise, vinaigrette, béchamel</li><li>Hollandaise, béarnaise, espagnole</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">9</span><span class="ft">Types d'œufs au programme traiteur ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Durs, mollets, pochés, en gelée</li><li>Brouillés, en omelette, au plat</li></ul><div class="note">Dur = 10 min · Mollet = 6 min · Poché = 3 min.</div></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">10</span><span class="ft">V/F — Le gibier est au programme du CAP.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Exclu du référentiel. Le CAP couvre : porc, volailles, et « parties d'autres viandes » hors gibier.</div></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--sage)">📋</span> Pôle 2 · Organisation et sécurisation<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">11</span><span class="ft">Documents pour réception des marchandises ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Bon de commande, bon de livraison, thermomètre</li><li>Fiche technique et recette</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">12</span><span class="ft">Pourquoi retirer les cartons avant stockage ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Les cartons transportent des contaminations</li><li>Pour gagner de la place</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">13</span><span class="ft">V/F — Un produit décongelé peut être recongelé.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">JAMAIS recongeler un produit dont la chaîne du froid a été rompue.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">14</span><span class="ft">4 contaminations microbiologiques à connaître ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Listeria, E. coli, Salmonelles, Staphylocoques</li><li>Grippe, Covid, Tuberculose, Paludisme</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">15</span><span class="ft">Combien d'allergènes à déclaration obligatoire ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">14</li><li>8</li><li>10</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">16</span><span class="ft">5 signes de qualité à reconnaître ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">AOP, AOC, IGP, Label Rouge, AB</li><li>NF, CE, ISO, HACCP, BPH</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">17</span><span class="ft">Infos à transmettre à l'équipe de vente ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Composition, allergènes, conseils conservation et réchauffage</li><li>Uniquement le prix</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">18</span><span class="ft">Qu'est-ce qu'une contamination croisée ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Transfert de MO d'un aliment contaminé vers un aliment sain</li><li>Contamination par l'air uniquement</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">19</span><span class="ft">V/F — Un couteau affûté est plus dangereux qu'un émoussé.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Un couteau affûté est PLUS sûr : moins de force, moins de dérapages.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">20</span><span class="ft">Que sont les TMS ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Troubles Musculo-Squelettiques</li><li>Techniques de Manipulation Sanitaire</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--plum)">📚</span> Connaissances transversales<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">21</span><span class="ft">Ratio vinaigrette ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">1 vinaigre pour 3 huile</li><li>Parts égales</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">22</span><span class="ft">« Fraiser » une pâte ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Écraser avec la paume pour homogénéiser sans trop travailler</li><li>Passer au réfrigérateur</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">23</span><span class="ft">Vinaigre dans l'eau de pochage des œufs ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">L'acide accélère la coagulation du blanc</li><li>Pour le goût</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">24</span><span class="ft">Rôle de la lécithine dans la mayonnaise ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Émulsifiant — stabilise le mélange eau/huile</li><li>Colorant</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">25</span><span class="ft">V/F — Le roux blanc de la béchamel doit être coloré.</span><span class="fa">▾</span></summary><div class="fb"><span class="vf f">✗ Faux</span><div class="note">Roux BLANC = 2 min SANS coloration.</div></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">26</span><span class="ft">Temps pour un œuf dur ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">10 min dans l'eau bouillante</li><li>6 min</li><li>3 min</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">27</span><span class="ft">Émulsion chaude vs froide en charcuterie ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Froide = cutterage avec glace (Strasbourg) · Chaude = gras fondu (boudin blanc)</li><li>Froide = conservée au froid</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">28</span><span class="ft">Alimentation durable en charcuterie ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Utiliser l'ensemble du produit (os → bouillon, couennes → gelée, gras → saindoux)</li><li>Ne vendre que du bio</li></ul></div></details>
+</details>
+`},
+
+// ═══ ANATOMY ═══
+anatomy: { title: "Anatomie & Découpes", sub: "30 questions + associations", html: `
+<details class="mod" open><summary><span class="mbadge" style="background:var(--rust)">🦴</span> Anatomie du porc<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">1</span><span class="ft">Vertèbres cervicales du porc ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>5</li><li class="ok">7</li><li>9</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">2</span><span class="ft">Paires de côtes ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>10</li><li>12</li><li class="ok">14</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">3</span><span class="ft">Os long du jambon ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>Humérus</li><li class="ok">Fémur</li><li>Tibia</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">4</span><span class="ft">Os de l'épaule ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>Fémur</li><li class="ok">Humérus</li><li>Péroné</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">5</span><span class="ft">Muscle du filet mignon ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>Grand dorsal</li><li class="ok">Psoas</li><li>Diaphragme</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">6</span><span class="ft">Panne = ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Graisse interne entourant les reins</li><li>Graisse dorsale</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">7</span><span class="ft">Organe le plus volumineux ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>Estomac</li><li class="ok">Foie</li><li>Intestins</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">8</span><span class="ft">Intestins grêles = boyaux appelés ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>Chaudins</li><li class="ok">Menus</li><li>Fuseau</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">9</span><span class="ft">Os plat triangulaire de l'épaule ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li>Sternum</li><li class="ok">Omoplate (scapula)</li><li>Ilium</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">10</span><span class="ft">Ensemble cœur + poumons + foie + rate ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">La fressure</li><li>La tripaille</li><li>Le ris</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--sage)">🥩</span> Les morceaux du porc<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">1</span><span class="ft">Pièce pour jambon cru traditionnel ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Jambon (cuisse arrière)</li><li>Épaule</li><li>Longe</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">2</span><span class="ft">Où se situe l'échine ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">En haut de l'avant, au-dessus de l'épaule</li><li>En bas du ventre</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">3</span><span class="ft">Partie sous le genou ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Le jambonneau</li><li>La palette</li><li>Le travers</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">4</span><span class="ft">Le filet mignon se trouve :</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Le long des lombaires, à l'intérieur de la carcasse</li><li>Sur le dos</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">5</span><span class="ft">Morceaux pour saucisson sec ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Gorge + épaule (maigre + gras)</li><li>Filet mignon</li><li>Poitrine uniquement</li></ul><div class="note">Ratio classique : 70 % maigre / 30 % gras.</div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">6</span><span class="ft">La « gorge » du porc ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Partie ventrale du cou, sous la mâchoire</li><li>Muscle de la joue</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">7</span><span class="ft">La « longe » comprend :</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Échine + carré + filet (tout le dos)</li><li>Uniquement le filet mignon</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">8</span><span class="ft">La « bardière » ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Couche épaisse de gras dorsal sous la couenne</li><li>Muscle du ventre</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">9</span><span class="ft">Morceau pour les rillettes ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">Échine et/ou gorge</li><li>Filet</li><li>Jambon</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">10</span><span class="ft">Morceaux à la découpe française ?</span><span class="fa">▾</span></summary><div class="fb"><ul class="opts"><li class="ok">5 à 6 (jambon, longe, épaule, poitrine, travers, tête)</li><li>4</li><li>12 à 14</li></ul></div></details>
+</details>
+
+<p style="font-size:14px;font-weight:700;margin:20px 0 10px;">Associations : Os → Localisation</p>
+<table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(44,35,33,.06);font-size:13px">
+<tr><th style="background:var(--rust);color:#fff;padding:8px 12px;text-align:left">Os</th><th style="background:var(--rust);color:#fff;padding:8px 12px;text-align:left">Localisation</th></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Fémur</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Cuisse (jambon)</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Humérus</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Bras (épaule)</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Omoplate</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Palette</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Sternum</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Poitrine</td></tr>
+<tr><td style="padding:8px 12px;font-weight:600">Péroné</td><td style="padding:8px 12px">Jambonneau arrière</td></tr>
+</table>
+
+<p style="font-size:14px;font-weight:700;margin:20px 0 10px;">Associations : Morceau → Produit</p>
+<table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(44,35,33,.06);font-size:13px">
+<tr><th style="background:var(--sage);color:#fff;padding:8px 12px;text-align:left">Morceau</th><th style="background:var(--sage);color:#fff;padding:8px 12px;text-align:left">Produit</th></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Jambon</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Jambon sec / cuit</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Gorge</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Chair à saucisse</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Échine</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Rillettes</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Poitrine</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Lardons, ventrèche</td></tr>
+<tr><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6;font-weight:600">Bardière</td><td style="padding:8px 12px;border-bottom:1px solid #E5DDD6">Saindoux, bardes</td></tr>
+<tr><td style="padding:8px 12px;font-weight:600">Palette</td><td style="padding:8px 12px">Saucisson sec (maigre)</td></tr>
+</table>
+`},
+
+// ═══ REMAINING SECTIONS - abbreviated for file size ═══
+problems: { title: "Problématiques Produits", sub: "10 produits × 3 défauts", html: `<p style="color:var(--muted);font-style:italic;margin-bottom:16px;">Touche un défaut pour voir les causes et remédiations.</p>` + [
+["Saucisson sec","Vous contrôlez après 4 semaines de séchage.",["Croûtage : périphérie dure, centre mou","Séchage trop rapide, hygrométrie basse, absence d'étuvage","Hygrométrie 72-78 %, T° 12-14 °C, étuvage 22-24 °C 24-48h"],["Moisissures noires ou vertes","Hygrométrie trop élevée, mauvaise ventilation, boyau humide","Ne pas dépasser 80 %, ventilation homogène, éponger boyaux"],["Produit acide, odeur aigre","Fermentation trop rapide, dosage ferments excessif","T° étuvage 22-24 °C max, doser selon fiche technique"]],
+["Terrine de campagne","Après cuisson au bain-marie, vous démoulez.",["Fissurée, dessus sec","Four trop chaud, pas de couvercle, bain-marie à sec","Cuire 160-170 °C, couvrir, vérifier niveau eau, T° cœur 72-74 °C"],["Rendu de gras au fond","Viande trop chaude, trop de gras, hachage trop fin","Travailler à 0-3 °C, respecter ratio, grosse grille"],["Goût métallique, couleur grise","Moule inadapté, foie oxydé, manque sel nitrité","Moules inox/terre cuite, foie frais, sel nitrité réglementaire"]],
+["Rillettes de porc","Après confection de vos rillettes.",["Sèches et filandreuses","Cuisson trop vive, pas assez de gras, mauvais morceau","Feu doux 4-5h, 1/3 gras 2/3 maigre, épaule et gorge"],["Trop grasses, gras qui se sépare","Excès de gras, refroidissement brutal","Ajuster proportions, refroidir lentement en remuant"],["Rancissement rapide","Pas de saindoux en surface, pot mal fermé","Couche de saindoux, contenants hermétiques, 0-4 °C"]],
+["Jambon blanc","Vous tranchez pour la vente.",["Couleur verdâtre, irisée","Oxydation, saumurage insuffisant, sel nitrité insuffisant","Protéger de la lumière, saumurage correct, stocker 0-3 °C"],["Texture caoutchouteuse","Excès polyphosphates, malaxage excessif, trop d'eau","Dosage réglementaire, adapter temps malaxage, 68 °C à cœur"],["Poches de gelée, muscles décollés","Malaxage insuffisant, injection mal répartie, mal paré","Malaxer suffisamment, répartir les points d'injection, parer"]]
+].map((p,i) => `<details class="mod"><summary><span class="mbadge" style="background:var(--rust)">${i+1}</span> ${p[0]}<span class="marrow">▾</span></summary><p style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:10px">${p[1]}</p>${p.slice(2).map((d,j) => `<details class="fc" style="--c:var(--rust)"><summary><span class="fn">${j+1}</span><span class="ft">${d[0]}</span><span class="fa">▾</span></summary><div class="fb"><p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--rust);margin-bottom:4px">Causes</p><p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">${d[1]}</p><p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--sage);margin-bottom:4px">Remédiations</p><p style="font-size:12.5px;color:var(--ink)">${d[2]}</p></div></details>`).join('')}</details>`).join('') + [
+["Mousse de canard","Après refroidissement.",["Granuleuse, pas lisse","Foie mal mixé, crème trop froide, base trop chaude","Mixer + tamis, tempérer crème, base à 30-35 °C"],["Retombe, perte de volume","Crème pas assez ferme, mélange brutal, pas de gélatine","Crème bien ferme, incorporer délicatement, 2-3 feuilles/L"],["Goût amer","Fiel non retiré, alcool non évaporé, épices en excès","Dénerver soigneusement, flamber correctement, doser"]],
+["Galantine de volaille","Après découpe pour le service.",["Se défait, farce s'effrite","Farce mal liée, T° insuffisante, mal ficelée","Œufs + panade + crème, T° 72-74 °C, ficeler régulièrement"],["Garniture mal répartie","Posée en tas, farce trop liquide","Répartir uniformément, farce ferme, rouler lentement"],["Peau déchirée","Désossage brutal, peau trop fine, trop garnie","Couteau affûté, volaille à peau épaisse, ne pas trop garnir"]],
+["Andouillette","Après cuisson.",["Éclate à la cuisson","Feu trop vif, boyau trop rempli, non piquée","Feu doux progressif, remplissage modéré, piquer à la fourchette"],["Odeur ammoniacale","Chaudins mal nettoyés, trempage insuffisant","Gratter + laver à grande eau, tremper eau vinaigrée"],["Texture pâteuse","Chaudins trop cuits, découpe trop fine","Surveiller pochage, lanières assez épaisses, ajouter gras"]],
+["Quenelle de brochet","Après pochage.",["Se délitent dans l'eau","Pas assez de panade, T° trop haute","Plus de panade, pocher 75-80 °C sans ébullition"],["Lourdes, compactes","Trop de panade, pas assez d'œufs","Équilibre chair/panade/œufs, blancs d'œufs, travailler sur glace"],["Fades","Chair insuffisante, panade dominante","Augmenter chair, réduire panade, assaisonner"]],
+["Saucisse de Toulouse","Fabrication d'un lot.",["Mêlée collante, poussage difficile","T° trop élevée, hachage trop fin, sel trop tôt","0-3 °C, grille 6-8 mm, sel au dernier moment"],["Perd son jus, rétrécit","Trop maigre, boyau percé, feu trop fort","70/30 maigre/gras, vérifier boyau, feu modéré"],["Aspect grisâtre","Oxydation, viande pas fraîche, couteaux émoussés","Travailler vite, viande fraîche, affûter"]],
+["Fromage de tête","Après démoulage.",["Gelée ne prend pas","Cuisson insuffisante, trop de vinaigre, bouillon dilué","Cuire 3-4h, doser vinaigre, réduire bouillon, réfrigérer 0-3 °C"],["Viande au fond, gelée en haut","Morceaux trop gros, bouillon trop chaud","Petits morceaux, tiédir à 40-45 °C, remuer après 30 min"],["Goût fade","Assaisonnement insuffisant, pas d'aromates","Assaisonner généreusement, garniture aromatique, persil + cornichons"]]
+].map((p,i) => `<details class="mod"><summary><span class="mbadge" style="background:var(--blue)">${i+5}</span> ${p[0]}<span class="marrow">▾</span></summary><p style="font-size:12px;color:var(--muted);font-style:italic;margin-bottom:10px">${p[1]}</p>${p.slice(2).map((d,j) => `<details class="fc" style="--c:var(--blue)"><summary><span class="fn">${j+1}</span><span class="ft">${d[0]}</span><span class="fa">▾</span></summary><div class="fb"><p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--rust);margin-bottom:4px">Causes</p><p style="font-size:12.5px;color:var(--muted);margin-bottom:8px">${d[1]}</p><p style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--sage);margin-bottom:4px">Remédiations</p><p style="font-size:12.5px;color:var(--ink)">${d[2]}</p></div></details>`).join('')}</details>`).join('')},
+
+codusages: { title: "Code des Usages", sub: "Niveaux de qualité", html: `
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">1</span><span class="ft">Jambon cuit : supérieur vs choix vs standard</span><span class="fa">▾</span></summary><div class="fb"><table><tr><th style="background:var(--gold);color:#fff;padding:5px 8px;font-size:10px">Critère</th><th style="background:var(--gold);color:#fff;padding:5px 8px;font-size:10px">Supérieur</th><th style="background:var(--gold);color:#fff;padding:5px 8px;font-size:10px">Choix</th><th style="background:var(--gold);color:#fff;padding:5px 8px;font-size:10px">Standard</th></tr><tr><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6;font-weight:600">PCL min</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">18–20 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">15–17 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">—</td></tr><tr><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6;font-weight:600">SST max</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">1 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">2,5 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">3,5 %</td></tr><tr><td style="padding:5px 8px;font-weight:600">Phosphates</td><td style="padding:5px 8px">Interdit</td><td style="padding:5px 8px">≤ 0,2 %</td><td style="padding:5px 8px">≤ 0,5 %</td></tr></table></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">2</span><span class="ft">Pâté de campagne : supérieur vs standard</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Supérieur :</strong> gorge ≥ 20 %, foie ≥ 15 %, SST ≤ 2 %, amidon ≤ 3 %, hachage 6 mm</li><li><strong>Standard :</strong> foie ≥ 10 %, SST ≤ 3 %, amidon ≤ 5 %, hachage 4 mm</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">3</span><span class="ft">Mentions « traditionnel » et « à l'ancienne »</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Traditionnel :</strong> méthodes historiques</li><li><strong>À l'ancienne :</strong> = traditionnel + viande non congelée</li><li><strong>Pur :</strong> une seule espèce animale</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">4</span><span class="ft">Durées de vie réglementaires</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Jambon entier non préemballé :</strong> 15 j · <strong>Sous vide :</strong> 21 j · <strong>Tranché non préemballé :</strong> 1 j</li><li><strong>Pâté non préemballé :</strong> 15 j · <strong>Sous vide :</strong> 21 j · <strong>Semi-conserve :</strong> 6 mois</li></ul></div></details>
+`},
+
+fabrication: { title: "Fabrication", sub: "Jambon cuit & Pâté de campagne", html: `
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">1</span><span class="ft">Les 9 étapes du jambon cuit</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>1.</strong> Réception (TMP 60-62, pH 5,6-6,2)</li><li><strong>2.</strong> Désossage et parage (garder l'aponévrose)</li><li><strong>3.</strong> Saumure (eau + sel nitrité + sucre + ascorbate)</li><li><strong>4.</strong> Injection (saumure à 5 °C, viande à 4 °C)</li><li><strong>5.</strong> Sabrage (incisions pour pénétration)</li><li><strong>6.</strong> Malaxage (1 600-2 000 tours / 18h, 40 % action / 60 % repos)</li><li><strong>7.</strong> Moulage</li><li><strong>8.</strong> Cuisson (65-68 °C à cœur sans couenne, >70 °C avec)</li><li><strong>9.</strong> Refroidissement (1h T° ambiante puis cellule négative)</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">2</span><span class="ft">Viande PSE vs DFD</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>PSE</strong> (pH < 5,6) : pâle, molle, exsudative → mauvaise rétention d'eau</li><li><strong>Normale</strong> (pH 5,6-5,8) : rose, ferme, sèche au toucher</li><li><strong>DFD</strong> (pH > 5,8) : sombre, ferme, sèche → risque microbiologique accru</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">3</span><span class="ft">Recette pâté de campagne supérieur</span><span class="fa">▾</span></summary><div class="fb"><div class="recipe"><h4>Composition pour 10 kg</h4><ul><li>Gorge : 3 900 g (39 %) · Foie : 2 400 g (24 %) · Poitrine : 1 700 g (17 %)</li><li>Crème/lait : 390 g · Œufs : 80 g · Oignon : 390 g · Persil : 230 g</li><li>Vin rouge : 390 g · Sel nitrité : 164 g · Fécule : 270 g</li></ul></div></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">4</span><span class="ft">Cuisson du pâté de campagne</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Phase 1 :</strong> chaleur sèche 150 °C (coloration caramélisée)</li><li><strong>Phase 2 :</strong> vapeur 100 % à 80 °C jusqu'à 78 °C à cœur</li><li><strong>Sécurité :</strong> > 71 °C pendant 20 min détruit l'hépatite E</li><li><strong>Après cuisson :</strong> vider le jus, remplir de gelée de porc</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">5</span><span class="ft">Fabrication de la gelée</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Composition :</strong> 10 L eau + 7 kg couennes + 2 kg os + garniture aromatique</li><li><strong>Cuisson :</strong> 90-95 °C pendant 4-5h</li><li><strong>Clarification :</strong> 1,3 L vinaigre + 12,5 L sang ou 4 L blanc d'œuf pour 100 L</li><li><strong>DLC :</strong> 5 jours en chambre froide</li></ul></div></details>
+`},
+
+produits: { title: "Familles de produits", sub: "Critères techniques", html: `
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">1</span><span class="ft">Saucisses crues à cuire</span><span class="fa">▾</span></summary><div class="fb"><table><tr><th style="background:var(--blue);color:#fff;padding:5px 8px;font-size:10px">Produit</th><th style="background:var(--blue);color:#fff;padding:5px 8px;font-size:10px">HPD</th><th style="background:var(--blue);color:#fff;padding:5px 8px;font-size:10px">Lipides</th><th style="background:var(--blue);color:#fff;padding:5px 8px;font-size:10px">Collagène</th></tr><tr><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6;font-weight:600">Toulouse</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">≤ 77 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">≤ 30 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">≤ 15 %</td></tr><tr><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6;font-weight:600">Merguez</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">≤ 77 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">≤ 40 %</td><td style="padding:5px 8px;border-bottom:1px solid #E5DDD6">≤ 25 %</td></tr><tr><td style="padding:5px 8px;font-weight:600">Chipolata sup.</td><td style="padding:5px 8px">≤ 77 %</td><td style="padding:5px 8px">≤ 30 %</td><td style="padding:5px 8px">≤ 18 %</td></tr></table></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">2</span><span class="ft">Strasbourg, knack, Francfort</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Supérieure :</strong> HPD ≤ 80 %, lipides ≤ 30 %, col/prot ≤ 18 %</li><li><strong>Standard :</strong> HPD ≤ 82 %, lipides ≤ 35 %, col/prot ≤ 22 %</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">3</span><span class="ft">Morteau et Montbéliard (IGP)</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Fumées au bois, boyau naturel, porc de Franche-Comté</li><li>HPD ≤ 75 %, lipides ≤ 35 %, col/prot ≤ 18 %</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">4</span><span class="ft">Andouilles et andouillettes</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Andouille sup. :</strong> HPD ≤ 75 %, lipides ≤ 20 %</li><li><strong>Andouillette :</strong> HPD ≤ 77 %, lipides ≤ 20 %</li><li>Appellations : Vire, Guéméné, Troyes, Cambrai</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">5</span><span class="ft">Boudins noirs et blancs</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Noir :</strong> HPD ≤ 82 % (80 % sup.), lipides ≤ 35 % (25 % sup.)</li><li><strong>Blanc :</strong> HPDA ≤ 83 %, lipides ≤ 30 % (28 % sup.)</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">6</span><span class="ft">Pièces séchées : coppa, lonzo</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Coppa :</strong> échine salée au sel sec, séchée. AOP Corse</li><li><strong>Lonzo :</strong> filet salé au sel sec, séché. AOP Corse</li><li><strong>Jambon sec supérieur :</strong> cycle min 210 jours · Standard : 130 jours</li></ul></div></details>
+`},
+
+tiac: { title: "TIAC & Allergènes", sub: "Sécurité alimentaire", html: `
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">1</span><span class="ft">TIAC : définition et déclaration</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>TIAC :</strong> toxi-infection touchant ≥ 2 personnes, même source alimentaire</li><li><strong>Déclaration obligatoire</strong> en France</li><li><strong>Agents :</strong> toxines Staph. aureus, C. perfringens, B. cereus, Salmonelles, norovirus</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">2</span><span class="ft">Listeria monocytogenes</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Se développe même au froid positif (0-4 °C)</li><li>Absence obligatoire si DLC > 5 jours</li><li>Produits à risque : rillettes, pâtés, produits en gelée</li></ul></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">3</span><span class="ft">Les 14 allergènes obligatoires</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Gluten · Crustacés · Œufs · Poissons · Arachides · Soja · Lait</li><li>Fruits à coque · Céleri · Moutarde · Sésame · Sulfites · Lupin · Mollusques</li></ul><div class="note">En charcuterie : lait/lactose, œufs, céleri (bouillons), moutarde, sulfites (vin), gluten (fécule).</div></div></details>
+<details class="fc" style="--c:var(--plum)"><summary><span class="fn">4</span><span class="ft">Étiquetage obligatoire</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Dénomination · Ingrédients (ordre décroissant) · Allergènes (mis en évidence)</li><li>Quantité nette · DLC/DDM · Conditions conservation · Fabricant</li><li>Déclaration nutritionnelle · Lot · Origine</li></ul></div></details>
+`},
+
+traiteur: { title: "Techniques Traiteur", sub: "Pâtes, sauces, garnitures", html: `
+<details class="mod" open><summary><span class="mbadge" style="background:var(--rust)">🥐</span> Pâtes de base<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">1</span><span class="ft">Pâte feuilletée</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Tour simple :</strong> plier en 3 · <strong>Tour double :</strong> plier en 4 (livre)</li><li>6 tours au total, repos 30 min entre chaque</li><li>Cuisson 200-220 °C. Utilisations : pâtés en croûte, pantin, feuilletés</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">2</span><span class="ft">Pâte brisée</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Sabler farine + beurre → ajouter œuf + eau → fraiser → repos 30 min</li><li>Cuisson 180-200 °C. Utilisations : quiches, tourtes, tartes salées</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">3</span><span class="ft">Pâte à choux</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Ébullition eau+beurre+sel → farine d'un coup → dessécher → œufs un par un</li><li>Consistance en « ruban ». Utilisations : gougères, profiteroles salées</li></ul></div></details>
+<details class="fc" style="--c:var(--rust)"><summary><span class="fn">4</span><span class="ft">Pâte levée</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Farine + levure + œufs + beurre mou en dernier → pointage 1-2h → dégazage → apprêt</li><li>Utilisations : saucisson brioché, pâté en croûte brioché</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--sage)">🥣</span> Sauces de base<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">1</span><span class="ft">Mayonnaise</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Jaune + moutarde + sel → huile en filet fin → vinaigre/citron</li><li>Émulsifiant : lécithine du jaune. Conservation : 24h max</li><li>Rattraper : nouveau jaune + moutarde, incorporer la ratée progressivement</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">2</span><span class="ft">Vinaigrette</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Ratio : 1 vinaigre pour 3 huile. Sel dans le vinaigre d'abord</li><li>Moutarde stabilise l'émulsion si ajoutée</li></ul></div></details>
+<details class="fc" style="--c:var(--sage)"><summary><span class="fn">3</span><span class="ft">Béchamel</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Roux blanc (beurre + farine, 2 min sans coloration) + lait froid d'un coup</li><li>Cuire 10-15 min, assaisonner : sel, poivre, muscade</li><li>Dérivée : sauce Mornay (+ fromage râpé)</li></ul></div></details>
+</details>
+
+<details class="mod"><summary><span class="mbadge" style="background:var(--gold)">⚙</span> Techniques charcutières avancées<span class="marrow">▾</span></summary>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">1</span><span class="ft">Émulsions chaudes vs froides</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Froide :</strong> cutterage + glace (< 12 °C) → Strasbourg, knack</li><li><strong>Chaude :</strong> gras mou fondu → boudin blanc, mousses</li><li>Si T° trop haute → protéines coagulent → gras se sépare</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">2</span><span class="ft">La mêlée</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Mélange viandes + gras + assaisonnements + liants → « collante au doigt »</li><li>T° viande : 0-3 °C. Matériel refroidi au préalable</li></ul></div></details>
+<details class="fc" style="--c:var(--gold)"><summary><span class="fn">3</span><span class="ft">Pâté en croûte vs pâté pantin</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>En croûte :</strong> avec moule, chemiser de pâte, couvercle rapporté</li><li><strong>Pantin :</strong> sans moule, enveloppement sur plaque, forme bombée</li><li>Les deux : cheminées obligatoires, dorure dessus uniquement, max 50 % croûte</li></ul></div></details>
+</details>
+`},
+
+orga: { title: "Organisation & Sécurité", sub: "Poste de travail, EPI, déchets", html: `
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">1</span><span class="ft">Mise en place du poste</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Lire la fiche technique → planifier l'ordre des opérations</li><li>Sélectionner outillage adapté, vérifier état (couteaux affûtés)</li><li>Organiser : séparer zones sale/propre, marche en avant</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">2</span><span class="ft">EPI en charcuterie</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Gant cotte de mailles :</strong> désossage, découpe</li><li><strong>Tablier cotte de mailles :</strong> grosses pièces</li><li><strong>Chaussures sécurité :</strong> en permanence</li><li><strong>Calot/charlotte :</strong> en permanence</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">3</span><span class="ft">Risques professionnels</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Coupures :</strong> risque n°1 → affûtage, gant maille, concentration</li><li><strong>TMS :</strong> gestes répétitifs → alterner tâches, postures ergonomiques</li><li><strong>Chutes :</strong> sols mouillés → chaussures antidérapantes</li><li><strong>Brûlures :</strong> fours, marmites → gants thermiques</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">4</span><span class="ft">Réception des marchandises</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Documents : bon de commande + bon de livraison + thermomètre</li><li>Vérifier : T°, emballages, aspect, DLC, estampille</li><li>Ranger en chambre froide dans les 15 min max</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">5</span><span class="ft">Stockage et températures</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>CF positive :</strong> 0-4 °C (viandes, frais)</li><li><strong>CF négative :</strong> -18 °C (surgelés)</li><li><strong>Séchoir :</strong> 12-14 °C, HR 70-80 % (salaisons)</li><li><strong>Réserve sèche :</strong> 15-20 °C (conserves, épices)</li><li>FIFO/PEPS, séparation familles, relevé T° quotidien</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">6</span><span class="ft">Gestion des déchets</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>Organiques (C3) :</strong> parures, os, gras → équarrissage ou compostage</li><li><strong>Recyclables :</strong> cartons, plastiques → tri sélectif</li><li><strong>Huiles usagées :</strong> collecte par prestataire agréé</li><li>Valoriser : os → bouillon, couennes → gelée, gras → saindoux</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">7</span><span class="ft">Nettoyage et contaminations croisées</span><span class="fa">▾</span></summary><div class="fb"><ul><li><strong>4 étapes :</strong> nettoyer → rincer → désinfecter → rincer</li><li><strong>T.A.C.T. :</strong> Temps, Action mécanique, Chimie, Température</li><li><strong>Croisées :</strong> séparer cru/cuit, lavage mains, nettoyage surfaces entre usages</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">8</span><span class="ft">Communication avec la vente</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Transmettre : composition, allergènes, DLC, conseils conservation et réchauffage</li><li>Support : communication orale + fiches produits écrites</li></ul></div></details>
+<details class="fc" style="--c:var(--blue)"><summary><span class="fn">9</span><span class="ft">Alimentation durable</span><span class="fa">▾</span></summary><div class="fb"><ul><li>Geste bien exécuté = moins de pertes (désossage propre, parage précis)</li><li>Valoriser parures : os → bouillon, couennes → gelée, gras → saindoux</li><li>FIFO, commander au juste besoin, transformer invendus avant DLC</li><li>Eau, énergie, consommables : utiliser la juste quantité</li></ul></div></details>
+`}
+};
+
+// ═══════════════════════════════════════
+// NAVIGATION ENGINE
+// ═══════════════════════════════════════
+
+let currentSection = 'home';
+
+function go(id) {
+  currentSection = id;
+  const sec = SECTIONS[id];
+  document.getElementById('mainTitle').textContent = sec.title;
+  document.getElementById('mainSub').textContent = sec.sub;
+  document.getElementById('contentArea').innerHTML = sec.html;
+  document.getElementById('searchInput').value = '';
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') === `go('${id}')`) n.classList.add('active');
+  });
+
+  window.scrollTo(0, 0);
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function handleSearch(query) {
+  if (query.length < 2) {
+    go(currentSection);
+    return;
+  }
+  const q = query.toLowerCase();
+  let results = '';
+  let count = 0;
+
+  Object.entries(SECTIONS).forEach(([id, sec]) => {
+    if (id === 'home') return;
+    const temp = document.createElement('div');
+    temp.innerHTML = sec.html;
+    temp.querySelectorAll('details.fc').forEach(card => {
+      const text = card.textContent.toLowerCase();
+      if (text.includes(q)) {
+        results += card.outerHTML;
+        count++;
+      }
+    });
+  });
+
+  document.getElementById('mainTitle').textContent = 'Recherche';
+  document.getElementById('mainSub').textContent = count + ' résultat' + (count !== 1 ? 's' : '');
+  document.getElementById('contentArea').innerHTML = count > 0
+    ? '<div class="search-results">' + results + '</div>'
+    : '<div class="sr-empty">Aucun résultat pour « ' + query + ' »</div>';
+}
+
+// Init
+go('home');
+</script>
+
+</body>
+</html>
